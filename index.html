@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Pro Wizard — Lottie + GIF — Single-file (1200+ lines)</title>
+
+<!-- ===================== External libs (CDN) ===================== -->
+<!-- Zepto (lightweight jQuery-like) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+
+<!-- Hammer.js for touch gestures -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<!-- Lottie web component -->
+<script src="https://unpkg.com/@lottiefiles/lottie-player@1.6.0/dist/lottie-player.js"></script>
+
+<!-- html2canvas and jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- ===================== Styling ===================== -->
+<style>
+  /* ---------- theme variables ---------- */
+  :root{
+    --bg-1:#041020;
+    --bg-2:#07162b;
+    --card:#0e2236;
+    --muted:#9fb0d8;
+    --accent:#2b7de9;
+    --accent-2:#6aa6ff;
+    --glass:rgba(255,255,255,0.03);
+    --white:#eaf2ff;
+  }
+  /* ---------- base reset ---------- */
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; -webkit-font-smoothing:antialiased}
+  html,body{height:100%;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--white);-webkit-user-select:none;user-select:none}
+  a{color:var(--accent)}
+  /* ---------- layout ---------- */
+  .app-wrap{height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .shell{width:100%;max-width:1200px;height:92vh;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));display:flex;overflow:hidden;border:1px solid rgba(255,255,255,0.03);box-shadow:0 14px 50px rgba(2,6,23,0.7);position:relative}
+  /* ---------- left column: visual + stickers ---------- */
+  .col-left{width:46%;min-width:340px;padding:26px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg, rgba(43,125,233,0.02), rgba(0,0,0,0.02))}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:900;font-size:22px}
+  .brand h1{font-size:20px;margin-bottom:2px}
+  .brand p{color:var(--muted);font-size:13px;margin-top:2px}
+  .preview-card{margin-top:8px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(255,255,255,0.03)}
+  .preview-icon{width:86px;height:86px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-weight:900;font-size:22px}
+  .preview-meta h2{font-size:18px;margin-bottom:6px}
+  .preview-meta p{color:var(--muted);font-size:13px}
+  .sticker-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .sticker{width:88px;height:88px;border-radius:12px;background:#081a2a;border:1px solid rgba(255,255,255,0.03);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .sticker img{width:100%;height:100%;object-fit:cover}
+  .left-actions{display:flex;gap:10px;margin-top:auto;align-items:center;justify-content:space-between}
+  .watermark-badge{font-size:12px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+  /* ---------- right column: slides ---------- */
+  .col-right{width:54%;padding:24px;display:flex;flex-direction:column;gap:12px}
+  .slide-stage{flex:1;border-radius:12px;border:1px solid rgba(255,255,255,0.02);overflow:hidden;background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent);position:relative}
+  .slides{display:flex;position:absolute;inset:0;transition:transform .6s cubic-bezier(.2,.9,.25,1);touch-action:none}
+  .slide{min-width:100%;padding:28px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;justify-content:center}
+  .slide h3{font-size:20px;margin-bottom:4px}
+  .slide p.lead{margin:0;color:var(--muted);font-size:13px}
+  .input-wrap{width:100%;display:flex;flex-direction:column;gap:8px}
+  input[type="text"], input[type="email"], input[type="number"], textarea, select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--white);font-size:15px}
+  textarea{min-height:120px;resize:vertical}
+  .controls{display:flex;align-items:center;gap:12px;justify-content:space-between;padding-top:8px}
+  .progress-outer{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,0.03);overflow:hidden;margin-right:14px}
+  .progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .45s}
+  .nav-btns{display:flex;gap:8px}
+  .btn{border:none;padding:10px 14px;border-radius:10px;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  .hint{color:var(--muted);font-size:13px}
+  .footer-mini{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+  /* ---------- animations ---------- */
+  .slide .enter { animation: slideIn .55s cubic-bezier(.2,.9,.25,1) both; }
+  .slide .leave { animation: slideOut .45s cubic-bezier(.2,.9,.25,1) both; }
+  @keyframes slideIn { from { opacity:0; transform:translateY(18px) scale(.995); } to { opacity:1; transform:none; } }
+  @keyframes slideOut { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(-12px) scale(.995); } }
+  /* ---------- watermark overlay for preview & PDF ---------- */
+  .wm-overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;opacity:0.12;mix-blend-mode:overlay}
+  .wm-overlay .wm-text{transform:rotate(-20deg);font-weight:800;letter-spacing:3px;color:#fff;font-size:18px}
+  /* ---------- responsive ---------- */
+  @media (max-width:980px){
+    .shell{flex-direction:column;height:100vh}
+    .col-left{width:100%;height:34vh;min-width:0;padding:12px}
+    .col-right{width:100%;height:calc(100vh - 34vh - 48px);padding:12px}
+    .sticker{width:72px;height:72px}
+  }
+  /* ---------- micro styles ---------- */
+  .muted{color:var(--muted)}
+  .loader{width:28px;height:28px;border-radius:50%;border:4px solid rgba(255,255,255,0.06);border-top-color:var(--accent);animation:spin 1s linear infinite}
+  @keyframes spin { to { transform:rotate(360deg); } }
+  /* ---------- high-contrast focus for accessibility ---------- */
+  input:focus, textarea:focus, select:focus, button:focus { outline:3px solid rgba(43,125,233,0.18); outline-offset:2px }
+  /* ---------- small helpers for large code comments spacing ---------- */
+  .big-note{padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+  <!-- ===================== App shell ===================== -->
+  <div class="app-wrap">
+    <div class="shell" role="application" aria-label="Pro wizard with Lottie & GIF stickers">
+
+      <!-- ===== LEFT: branding, preview, animated stickers (Lottie + GIF) ===== -->
+      <div class="col-left" aria-hidden="false">
+        <div class="brand">
+          <div class="logo">PR</div>
+          <div>
+            <h1>Pro Wizard Builder</h1>
+            <p class="muted">One input per slide — animated, responsive, and ready for production tweaking.</p>
+          </div>
+        </div>
+
+        <!-- preview card: shows dynamic title, developer, short description -->
+        <div class="preview-card" id="previewCard">
+          <div class="preview-icon" id="previewIcon">A</div>
+          <div class="preview-meta">
+            <h2 id="pvTitle">App Title</h2>
+            <p id="pvSub">Developer • package.id • Rated</p>
+            <p id="pvShort" class="muted" style="margin-top:8px">Short description will appear here as you fill the slides.</p>
+          </div>
+        </div>
+
+        <!-- Lottie & GIF sticker row -->
+        <div class="sticker-row" id="stickerRow">
+          <!-- sticker 1: Lottie -->
+          <div class="sticker" title="Lottie animation 1">
+            <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_0fhlytwe.json" background="transparent" speed="1" loop autoplay style="width:100%;height:100%"></lottie-player>
+          </div>
+          <!-- sticker 2: GIF -->
+          <div class="sticker" title="GIF 1">
+            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="gif1"/>
+          </div>
+          <!-- sticker 3: Lottie -->
+          <div class="sticker" title="Lottie animation 2">
+            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_w51pcehl.json" background="transparent" speed="1" loop autoplay style="width:100%;height:100%"></lottie-player>
+          </div>
+          <!-- sticker 4: GIF -->
+          <div class="sticker" title="GIF 2">
+            <img src="https://media.giphy.com/media/l3vR8a3Zc5w1K0z2Y/giphy.gif" alt="gif2"/>
+          </div>
+          <!-- sticker 5: Lottie -->
+          <div class="sticker" title="Lottie animation 3">
+            <lottie-player src="https://assets9.lottiefiles.com/packages/lf20_jcikwtux.json" background="transparent" speed="1" loop autoplay style="width:100%;height:100%"></lottie-player>
+          </div>
+        </div>
+
+        <!-- watermark badge and sample actions -->
+        <div class="left-actions">
+          <div class="watermark-badge" id="wmBadge">anonymous • Not generated yet</div>
+          <div style="display:flex;gap:8px">
+            <button id="btnPreviewSmall" class="btn ghost" title="Quick preview">Quick preview</button>
+            <button id="btnHelp" class="btn ghost" title="Open help">Help</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== RIGHT: slides & controls ===== -->
+      <div class="col-right">
+
+        <!-- slide container -->
+        <div class="slide-stage" id="slideStage" aria-live="polite">
+          <div class="slides" id="slides">
+
+            <!-- ---------- Slide 1: App Name ---------- -->
+            <section class="slide" data-step="1" aria-label="App Name">
+              <h3>1. App Name</h3>
+              <p class="lead">Enter the main app title. Keep it short and recognizable.</p>
+              <div class="input-wrap">
+                <input id="f_appName" type="text" placeholder="e.g., VTU Premium Notes" maxlength="80" />
+                <div class="big-note muted">This text will appear prominently in the PDF preview and watermark.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 2: Developer ---------- -->
+            <section class="slide" data-step="2" aria-label="Developer / Publisher">
+              <h3>2. Developer / Publisher</h3>
+              <p class="lead">Who is building or publishing this app?</p>
+              <div class="input-wrap">
+                <input id="f_developer" type="text" placeholder="Your name or company" maxlength="80" />
+                <div class="muted">Will show under the app title in the preview.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 3: Package ID ---------- -->
+            <section class="slide" data-step="3" aria-label="Package ID">
+              <h3>3. Package ID</h3>
+              <p class="lead">Unique identifier (e.g., com.company.app)</p>
+              <div class="input-wrap">
+                <input id="f_packageId" type="text" placeholder="com.example.app" maxlength="120" />
+                <div class="muted">No spaces; lowercase; used for Play Store deep links.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 4: Category ---------- -->
+            <section class="slide" data-step="4" aria-label="Category">
+              <h3>4. Category</h3>
+              <p class="lead">Select the primary category for the app.</p>
+              <div class="input-wrap">
+                <select id="f_category">
+                  <option>Productivity</option>
+                  <option>Education</option>
+                  <option>Business</option>
+                  <option>Tools</option>
+                  <option>Entertainment</option>
+                  <option>Utilities</option>
+                </select>
+                <div class="muted">Choose the best fit; affects search and discovery.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 5: Content Rating ---------- -->
+            <section class="slide" data-step="5" aria-label="Content Rating">
+              <h3>5. Content Rating</h3>
+              <p class="lead">Select the appropriate age rating.</p>
+              <div class="input-wrap">
+                <select id="f_contentRating">
+                  <option>Rated for 3+</option>
+                  <option>Rated for 7+</option>
+                  <option>Rated for 12+</option>
+                  <option>Rated for 16+</option>
+                </select>
+                <div class="muted">This will display next to the app in the preview.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 6: Short Description ---------- -->
+            <section class="slide" data-step="6" aria-label="Short Description">
+              <h3>6. Short Description</h3>
+              <p class="lead">One-line summary that hooks the reader.</p>
+              <div class="input-wrap">
+                <input id="f_shortDesc" type="text" maxlength="160" placeholder="One line summary" />
+                <div class="muted">Shown in preview and used for marketing copy in the PDF.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 7: Long Description ---------- -->
+            <section class="slide" data-step="7" aria-label="Long Description">
+              <h3>7. Long Description</h3>
+              <p class="lead">Detailed description describing features, benefits, and usage.</p>
+              <div class="input-wrap">
+                <textarea id="f_longDesc" placeholder="Explain features, benefits, steps to use..."></textarea>
+                <div class="muted">This text will be included in the PDF. Use new lines for paragraphs.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 8: Primary Lottie (animated intro) ---------- -->
+            <section class="slide" data-step="8" aria-label="Primary Lottie">
+              <h3>8. Choose Primary Animation (Lottie)</h3>
+              <p class="lead">Pick a Lottie animation to represent your app on the left preview.</p>
+              <div class="input-wrap">
+                <select id="f_lottieChoice">
+                  <option value="none">Use default icon</option>
+                  <option value="https://assets9.lottiefiles.com/packages/lf20_0fhlytwe.json">Lottie — Paper Plane</option>
+                  <option value="https://assets2.lottiefiles.com/packages/lf20_w51pcehl.json">Lottie — Rocket</option>
+                  <option value="https://assets9.lottiefiles.com/packages/lf20_jcikwtux.json">Lottie — Mobile UI</option>
+                </select>
+                <div class="muted">Selecting a Lottie will replace the preview icon with that animation.</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <div style="flex:1" class="big-note muted">Lottie animations are loaded from LottieFiles CDN and autoplay. Replace URLs to use your branded animation JSONs.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 9: Screenshots upload ---------- -->
+            <section class="slide" data-step="9" aria-label="Screenshots">
+              <h3>9. Upload Screenshots</h3>
+              <p class="lead">Add up to 4 screenshots to include in the PDF preview.</p>
+              <div class="input-wrap">
+                <input id="f_screens" type="file" accept="image/*" multiple />
+                <div id="thumbs" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
+                <div class="muted">Drag & drop on desktop. Mobile: use camera or gallery. Thumbnails appear here.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 10: Support Email (used for watermark) ---------- -->
+            <section class="slide" data-step="10" aria-label="Support Email">
+              <h3>10. Support / Forensics Email</h3>
+              <p class="lead">This email will be stamped on generated previews to help trace leaks.</p>
+              <div class="input-wrap">
+                <input id="f_email" type="email" placeholder="you@domain.com" />
+                <div class="muted">A forensic watermark with your email and timestamp is added to generated PDF.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 11: Pricing ---------- -->
+            <section class="slide" data-step="11" aria-label="Pricing">
+              <h3>11. Pricing</h3>
+              <p class="lead">Set price or mark free. This appears in the PDF invoice section.</p>
+              <div class="input-wrap">
+                <select id="f_pricing">
+                  <option value="free">Free</option>
+                  <option value="paid">Paid</option>
+                </select>
+                <div id="priceBox" style="margin-top:8px;display:none">
+                  <input id="f_price" type="number" min="0" placeholder="Price (INR)" />
+                </div>
+                <div class="muted">Optional — used for invoice preview if you need it.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 12: Promo GIF selection ---------- -->
+            <section class="slide" data-step="12" aria-label="Promo GIF">
+              <h3>12. Promo GIF / Sticker</h3>
+              <p class="lead">Choose a promotional GIF or sticker to show on the left panel.</p>
+              <div class="input-wrap">
+                <select id="f_gifChoice">
+                  <option value="none">No GIF</option>
+                  <option value="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif">GIF — Sparkles</option>
+                  <option value="https://media.giphy.com/media/l3vR8a3Zc5w1K0z2Y/giphy.gif">GIF — Flow</option>
+                  <option value="https://media.giphy.com/media/26xBwdIuRJiAIqHwA/giphy.gif">GIF — Pop</option>
+                </select>
+                <div class="muted">GIFs autoplay on the left sticker area. Replace with your own branded GIF URLs.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 13: App Icon Upload (optional) ---------- -->
+            <section class="slide" data-step="13" aria-label="App Icon">
+              <h3>13. Upload App Icon</h3>
+              <p class="lead">Optional: upload a square PNG/JPG icon to use in PDF.</p>
+              <div class="input-wrap">
+                <input id="f_icon" type="file" accept="image/*" />
+                <div class="muted">If no icon provided, initials from the App Name will be used.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 14: Legal / Terms checkbox ---------- -->
+            <section class="slide" data-step="14" aria-label="Terms">
+              <h3>14. Terms & Confirm</h3>
+              <p class="lead">Confirm that you own the assets and have distribution rights.</p>
+              <div class="input-wrap">
+                <label style="display:flex;align-items:center;gap:8px"><input id="f_terms" type="checkbox" /> I confirm I have the rights to distribute these materials.</label>
+                <div class="muted">This affirmation is required before generating protected previews.</div>
+              </div>
+            </section>
+
+            <!-- ---------- Slide 15: Finalize & Generate ---------- -->
+            <section class="slide" data-step="15" aria-label="Finalize">
+              <h3>15. Finalize & Generate Protected Preview</h3>
+              <p class="lead">When ready, generate a rasterized PDF preview with watermark (embedded).</p>
+              <div class="input-wrap" style="gap:12px">
+                <button id="btnGenerate" class="btn">Generate Protected Preview (PDF)</button>
+                <div id="genInfo" class="muted" style="margin-top:6px">The generated PDF will be embedded in a modal. No direct download button is shown in the UI.</div>
+                <div id="genStatus" style="margin-top:10px"></div>
+              </div>
+            </section>
+
+            <!-- ---------- Extra slides: optional advanced fields (to grow file size & functionality) ---------- -->
+
+            <!-- Slide 16: Advanced: Custom CSS or Theme -->
+            <section class="slide" data-step="16" aria-label="Theme">
+              <h3>16. (Advanced) Theme Accent Color</h3>
+              <p class="lead">Optionally pick a primary accent color for marketing materials.</p>
+              <div class="input-wrap">
+                <input id="f_accent" type="color" value="#2b7de9" />
+                <div class="muted">Changing this updates the live preview accents (left panel and progress bar).</div>
+              </div>
+            </section>
+
+            <!-- Slide 17: Advanced: Add a coupon code (for invoice preview) -->
+            <section class="slide" data-step="17" aria-label="Coupon">
+              <h3>17. Coupon Code (Optional)</h3>
+              <p class="lead">Add a coupon code to preview discounted invoice pricing.</p>
+              <div class="input-wrap">
+                <input id="f_coupon" type="text" placeholder="STUDENT50" />
+                <div class="muted">If provided and valid (you define rules), it will be applied to invoice preview.</div>
+              </div>
+            </section>
+
+            <!-- Slide 18: Advanced: Custom footer text for PDF -->
+            <section class="slide" data-step="18" aria-label="Footer">
+              <h3>18. PDF Footer (Optional)</h3>
+              <p class="lead">Add a short footer to all generated PDFs.</p>
+              <div class="input-wrap">
+                <input id="f_footer" type="text" placeholder="© My Company — All rights reserved" />
+                <div class="muted">This text will be added as small footer on the generated preview PDF.</div>
+              </div>
+            </section>
+
+            <!-- Slide 19: (Demo) Quick links preview -->
+            <section class="slide" data-step="19" aria-label="Quick Links">
+              <h3>19. Quick Links (Optional)</h3>
+              <p class="lead">Add links to include in PDF as "Support / Website".</p>
+              <div class="input-wrap">
+                <input id="f_website" type="text" placeholder="https://your-site.example" />
+                <div class="muted">Will be shown in the PDF contact block.</div>
+              </div>
+            </section>
+
+            <!-- Slide 20: Final checks & finish -->
+            <section class="slide" data-step="20" aria-label="Finish">
+              <h3>20. Ready to finish</h3>
+              <p class="lead">Review all the slides — use Prev/Next or swipe. Click Generate when satisfied.</p>
+              <div class="input-wrap">
+                <div class="muted">You can go back and change anything. Final PDF will reflect the current values and screenshots.</div>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button id="btnFinishPreview" class="btn ghost">Quick Generate (demo)</button>
+                  <button id="btnExportJSON" class="btn ghost">Export JSON Draft</button>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+
+        <!-- navigation & progress -->
+        <div class="controls" role="navigation" aria-label="Wizard controls">
+          <div class="progress-outer" title="Progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+
+          <div class="nav-btns">
+            <button id="btnPrev" class="btn ghost">← Prev</button>
+            <button id="btnNext" class="btn">Next →</button>
+          </div>
+        </div>
+
+        <div class="footer-mini">
+          <div class="muted">Tip: swipe left/right on mobile. Press Enter to proceed.</div>
+          <div class="muted" id="stepIndicator">Step 1 / 20</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Hidden area to render PDF content (offscreen) ===================== -->
+  <div id="pdfRenderContainer" style="position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none"></div>
+
+  <!-- ===================== Modal for embedded PDF preview (created by JS) ===================== -->
+  <!-- The modal is created dynamically in JS to keep HTML tidy. -->
+
+<script>
+/* ========================================================================
+   PRO WIZARD — Single-file JS
+   - Handles slide navigation (swipe + keyboard)
+   - Live preview syncing
+   - Lottie/GIF management
+   - File uploads & thumbnails
+   - PDF generation with watermark (html2canvas + jsPDF)
+   - Deterrents: disable right-click, block typical shortcuts
+   - Draft saving to localStorage
+   ======================================================================== */
+
+/* ------------------ Basic helpers ------------------ */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+// slide state
+let currentIndex = 0;
+const slidesWrap = $('#slides');
+const slides = $$('.slide');
+const TOTAL = slides.length;
+
+// data storage
+let DRAFT = {
+  appName: '',
+  developer: '',
+  packageId: '',
+  category: 'Productivity',
+  contentRating: 'Rated for 3+',
+  shortDesc: '',
+  longDesc: '',
+  lottie: 'none',
+  gif: 'none',
+  icon: null,
+  screenshots: [],
+  email: '',
+  pricing: 'free',
+  price: '',
+  terms: false,
+  accent: '#2b7de9',
+  coupon: '',
+  footer: '',
+  website: ''
+};
+
+/* ------------------ Utility functions ------------------ */
+
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+function persistDraft(){
+  // store useful keys only
+  const s = {
+    appName: DRAFT.appName,
+    developer: DRAFT.developer,
+    packageId: DRAFT.packageId,
+    category: DRAFT.category,
+    contentRating: DRAFT.contentRating,
+    shortDesc: DRAFT.shortDesc,
+    longDesc: DRAFT.longDesc,
+    lottie: DRAFT.lottie,
+    gif: DRAFT.gif,
+    screenshots: DRAFT.screenshots,
+    email: DRAFT.email,
+    pricing: DRAFT.pricing,
+    price: DRAFT.price,
+    terms: DRAFT.terms,
+    accent: DRAFT.accent,
+    coupon: DRAFT.coupon,
+    footer: DRAFT.footer,
+    website: DRAFT.website,
+    savedAt: new Date().toISOString()
+  };
+  localStorage.setItem('pro_wizard_draft_v2', JSON.stringify(s));
+}
+
+function loadDraft(){
+  try {
+    const raw = localStorage.getItem('pro_wizard_draft_v2');
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    Object.assign(DRAFT, parsed);
+    // restore screenshots array if present
+    if (!Array.isArray(DRAFT.screenshots)) DRAFT.screenshots = [];
+  } catch(err){
+    console.warn('Failed to load draft', err);
+  }
+}
+
+function updateStepIndicator(){
+  $('#stepIndicator').textContent = `Step ${currentIndex+1} / ${TOTAL}`;
+  const pct = Math.round(((currentIndex+1)/TOTAL)*100);
+  $('#progressBar').style.width = pct + '%';
+}
+
+/* ------------------ Slide navigation ------------------ */
+function goTo(index){
+  index = clamp(index, 0, TOTAL-1);
+  const prev = currentIndex;
+  if (prev === index) return;
+  // animation classes (optional)
+  const prevSlide = slides[prev];
+  const nextSlide = slides[index];
+  prevSlide.querySelectorAll('*').forEach(n => n.classList.add('leave'));
+  setTimeout(()=> prevSlide.querySelectorAll('*').forEach(n => n.classList.remove('leave')), 200);
+
+  slidesWrap.style.transform = `translateX(-${index*100}%)`;
+  nextSlide.querySelectorAll('*').forEach(n => n.classList.add('enter'));
+  setTimeout(()=> nextSlide.querySelectorAll('*').forEach(n => n.classList.remove('enter')), 650);
+  currentIndex = index;
+  updateStepIndicator();
+  // update nav button labels
+  $('#btnPrev').disabled = currentIndex === 0;
+  $('#btnNext').textContent = (currentIndex === TOTAL-1) ? 'Finish' : 'Next →';
+  // persist scroll or reset
+  document.querySelector('.slide-stage').scrollTop = 0;
+  // small claim about preview
+  hydratePreview();
+}
+
+$('#btnNext').addEventListener('click', ()=> {
+  if (currentIndex >= TOTAL-1) {
+    // last slide — do final action
+    $('#btnGenerate').click();
+    return;
+  }
+  goTo(currentIndex + 1);
+});
+
+$('#btnPrev').addEventListener('click', ()=> goTo(currentIndex - 1));
+
+// keyboard navigation
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+  if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
+  if (e.key === 'Enter') {
+    // Enter to move forward if focused in an input, otherwise default
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+      // if last slide and the generate button is visible, trigger it
+      if (currentIndex === TOTAL-1) $('#btnGenerate').click();
+      else goTo(currentIndex + 1);
+    }
+  }
+});
+
+// swipe via Hammer.js (if available)
+(function setupSwipe(){
+  const stage = document.getElementById('slideStage');
+  if (window.Hammer) {
+    const mc = new Hammer(stage);
+    mc.on('swipeleft', ()=> goTo(currentIndex + 1));
+    mc.on('swiperight', ()=> goTo(currentIndex - 1));
+  } else {
+    // basic pointer fallback
+    let sx = null;
+    stage.addEventListener('pointerdown', e => sx = e.clientX);
+    stage.addEventListener('pointerup', e => {
+      if (sx === null) return;
+      const dx = e.clientX - sx;
+      if (dx < -80) goTo(currentIndex + 1);
+      if (dx > 80) goTo(currentIndex - 1);
+      sx = null;
+    });
+  }
+})();
+
+/* ------------------ Wire fields to DRAFT and preview ------------------ */
+function qs(id) { return document.getElementById(id); }
+
+// connect many inputs
+const wiring = [
+  ['f_appName','appName'],
+  ['f_developer','developer'],
+  ['f_packageId','packageId'],
+  ['f_category','category'],
+  ['f_contentRating','contentRating'],
+  ['f_shortDesc','shortDesc'],
+  ['f_longDesc','longDesc'],
+  ['f_lottieChoice','lottie'],
+  ['f_gifChoice','gif'],
+  ['f_email','email'],
+  ['f_pricing','pricing'],
+  ['f_price','price'],
+  ['f_accent','accent'],
+  ['f_coupon','coupon'],
+  ['f_footer','footer'],
+  ['f_website','website']
+];
+
+wiring.forEach(([elId, key])=>{
+  const el = qs(elId);
+  if (!el) return;
+  el.addEventListener('input', (ev)=>{
+    if (el.type === 'checkbox') DRAFT[key] = el.checked;
+    else DRAFT[key] = el.value;
+    persistDraft();
+    hydratePreview();
+  });
+  // also trigger change for select elements
+  el.addEventListener('change', ()=> { DRAFT[key] = el.value; persistDraft(); hydratePreview(); });
+});
+
+// price visibility
+qs('f_pricing').addEventListener('change', () => {
+  const val = qs('f_pricing').value;
+  qs('priceBox').style.display = val === 'paid' ? 'block' : 'none';
+});
+
+// terms checkbox
+qs('f_terms').addEventListener('change', ()=> { DRAFT.terms = qs('f_terms').checked; persistDraft(); });
+
+// file uploads — icon
+qs('f_icon').addEventListener('change', async (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const d = await fileToDataURL(f);
+  DRAFT.icon = d;
+  persistDraft();
+  hydratePreview();
+});
+
+// file uploads — screenshots (multiple)
+qs('f_screens').addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files || []);
+  for (let i=0;i<files.length && DRAFT.screenshots.length<4;i++){
+    try {
+      const d = await fileToDataURL(files[i]);
+      DRAFT.screenshots.push(d);
+      addThumbnail(d);
+    } catch(err){ console.warn('Failed to read screenshot', err); }
+  }
+  persistDraft();
+  hydratePreview();
+});
+
+// helper: file to dataURL
+function fileToDataURL(file){
+  return new Promise((res, rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// thumbnails container
+function addThumbnail(dataUrl){
+  const thumbs = qs('thumbs');
+  const wrapper = document.createElement('div');
+  wrapper.style.width = '84px';
+  wrapper.style.height = '120px';
+  wrapper.style.borderRadius = '8px';
+  wrapper.style.overflow = 'hidden';
+  wrapper.style.border = '1px solid rgba(255,255,255,0.04)';
+  wrapper.style.position = 'relative';
+  wrapper.style.marginRight = '8px';
+  wrapper.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover"/><button title="Remove" style="position:absolute;right:6px;top:6px;background:rgba(0,0,0,0.5);border:none;color:white;border-radius:6px;padding:4px;cursor:pointer">✕</button>`;
+  const btn = wrapper.querySelector('button');
+  btn.addEventListener('click', ()=> {
+    const idx = Array.from(thumbs.children).indexOf(wrapper);
+    if (idx >= 0) DRAFT.screenshots.splice(idx,1);
+    wrapper.remove();
+    persistDraft();
+    hydratePreview();
+  });
+  thumbs.appendChild(wrapper);
+}
+
+/* ------------------ Preview hydration ------------------ */
+function hydratePreview(){
+  // title
+  qs('pvTitle').textContent = DRAFT.appName || 'App Title';
+  // sub
+  qs('pvSub').textContent = `${DRAFT.developer || 'Developer'} • ${DRAFT.packageId || 'package.id'} • ${DRAFT.contentRating || ''}`;
+  // short description
+  qs('pvShort').textContent = DRAFT.shortDesc || DRAFT.longDesc || 'Short description will appear here.';
+  // icon
+  const iconEl = qs('previewIcon');
+  if (DRAFT.icon) {
+    iconEl.style.backgroundImage = `url(${DRAFT.icon})`;
+    iconEl.style.backgroundSize = 'cover';
+    iconEl.textContent = '';
+  } else if (DRAFT.lottie && DRAFT.lottie !== 'none') {
+    // embed lottie in preview icon (replace inner markup)
+    // remove existing children
+    iconEl.innerHTML = '';
+    const player = document.createElement('lottie-player');
+    player.setAttribute('src', DRAFT.lottie);
+    player.setAttribute('background','transparent');
+    player.setAttribute('speed','1');
+    player.setAttribute('loop','');
+    player.setAttribute('autoplay','');
+    player.style.width = '100%';
+    player.style.height = '100%';
+    iconEl.appendChild(player);
+    iconEl.style.backgroundImage = 'none';
+  } else {
+    // default initials
+    iconEl.innerHTML = '';
+    iconEl.style.backgroundImage = 'none';
+    iconEl.textContent = (DRAFT.appName || 'A').slice(0,2).toUpperCase();
+  }
+
+  // left GIF choice
+  const stickerRow = qs('stickerRow');
+  // first GIF sticker element is the second child (index 1 in our markup)
+  const gifChoice = DRAFT.gif || qs('f_gifChoice').value || 'none';
+  // update second sticker (index 1)
+  const stickerEls = stickerRow.querySelectorAll('.sticker');
+  if (stickerEls && stickerEls.length >= 2) {
+    const gifEl = stickerEls[1].querySelector('img');
+    if (gifChoice && gifChoice !== 'none') {
+      gifEl.src = gifChoice;
+      gifEl.style.display = 'block';
+    } else {
+      // fallback to default GIF
+      gifEl.src = 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif';
+    }
+  }
+
+  // watermark badge
+  const now = new Date().toLocaleString();
+  qs('wmBadge').textContent = `${DRAFT.email || 'anonymous'} • ${DRAFT.appName || 'Unnamed'} • ${now}`;
+
+  // accent color apply (progress bar and brand)
+  document.documentElement.style.setProperty('--accent', DRAFT.accent || '#2b7de9');
+  document.documentElement.style.setProperty('--accent-2', shadeColor(DRAFT.accent || '#2b7de9', 30));
+  qs('progressBar').style.background = `linear-gradient(90deg, ${DRAFT.accent || '#2b7de9'}, ${shadeColor(DRAFT.accent || '#2b7de9', 30)})`;
+  qs('logo').style.background = `linear-gradient(135deg, ${DRAFT.accent || '#2b7de9'}, ${shadeColor(DRAFT.accent || '#2b7de9', 30)})`; // safe if element exists
+
+  // preview card background first screenshot if exists
+  const previewCard = qs('previewCard');
+  if (DRAFT.screenshots && DRAFT.screenshots[0]) {
+    previewCard.style.backgroundImage = `url(${DRAFT.screenshots[0]})`;
+    previewCard.style.backgroundSize = 'cover';
+    previewCard.style.backgroundBlendMode = 'overlay';
+  } else {
+    previewCard.style.backgroundImage = 'none';
+  }
+}
+
+/* ------------------ helper: shade color (simple) ------------------ */
+function shadeColor(hex, percent) {
+  // hex: #rrggbb, percent: -100..100
+  if (!hex) return '#6aa6ff';
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16);
+  const g = parseInt(h.substring(2,4),16);
+  const b = parseInt(h.substring(4,6),16);
+  const t = percent < 0 ? 0 : 255;
+  const p = Math.abs(percent)/100;
+  const R = Math.round((t - r) * p) + r;
+  const G = Math.round((t - g) * p) + g;
+  const B = Math.round((t - b) * p) + b;
+  return `rgb(${R}, ${G}, ${B})`;
+}
+
+/* ------------------ load draft on boot ------------------ */
+loadDraft();
+// hydrate fields from DRAFT into inputs (if loaded)
+function hydrateInputs(){
+  wiring = [
+    ['f_appName','appName'],
+    ['f_developer','developer'],
+    ['f_packageId','packageId'],
+    ['f_category','category'],
+    ['f_contentRating','contentRating'],
+    ['f_shortDesc','shortDesc'],
+    ['f_longDesc','longDesc'],
+    ['f_lottieChoice','lottie'],
+    ['f_gifChoice','gif'],
+    ['f_email','email'],
+    ['f_pricing','pricing'],
+    ['f_price','price'],
+    ['f_accent','accent'],
+    ['f_coupon','coupon'],
+    ['f_footer','footer'],
+    ['f_website','website']
+  ];
+  wiring.forEach(([id,key])=>{
+    const el = qs(id);
+    if (!el) return;
+    if (DRAFT[key] !== undefined && DRAFT[key] !== null) {
+      el.value = DRAFT[key];
+      // special handling for select boxes
+      if (el.tagName === 'SELECT') el.selectedIndex = Array.from(el.options).findIndex(o => o.value === DRAFT[key]) || 0;
+    }
+  });
+  // checkbox
+  qs('f_terms').checked = DRAFT.terms === true;
+  // price box visibility
+  qs('priceBox').style.display = DRAFT.pricing === 'paid' ? 'block' : 'none';
+  // screenshots thumbnails
+  if (DRAFT.screenshots && DRAFT.screenshots.length) {
+    DRAFT.screenshots.forEach(s => addThumbnail(s));
+  }
+}
+hydrateInputs();
+hydratePreview();
+updateStepIndicator();
+
+/* ------------------ small UI extras ------------------ */
+$('#btnPreviewSmall').addEventListener('click', ()=> {
+  goTo(14); // terms slide index for quick check
+});
+
+/* ------------------ Generate Protected PDF ------------------ */
+function createPdfModal(){
+  // create modal once
+  let modal = document.getElementById('pdfModal');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'pdfModal';
+  modal.style.position = 'fixed';
+  modal.style.inset = '0';
+  modal.style.background = 'rgba(0,0,0,0.6)';
+  modal.style.display = 'none';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+
+  const card = document.createElement('div');
+  card.style.width = '92%';
+  card.style.maxWidth = '980px';
+  card.style.height = '86vh';
+  card.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006))';
+  card.style.borderRadius = '12px';
+  card.style.padding = '12px';
+  card.style.display = 'flex';
+  card.style.flexDirection = 'column';
+  card.style.gap = '12px';
+  card.style.border = '1px solid rgba(255,255,255,0.04)';
+
+  const top = document.createElement('div');
+  top.style.display = 'flex';
+  top.style.justifyContent = 'space-between';
+  top.style.alignItems = 'center';
+  top.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><div class="loader"></div><div style="color:var(--muted)">Generating protected preview…</div></div><div><button id="pdfClose" class="btn ghost">Close</button></div>`;
+
+  const frameWrap = document.createElement('div');
+  frameWrap.style.flex = '1';
+  frameWrap.style.borderRadius = '10px';
+  frameWrap.style.overflow = 'hidden';
+  frameWrap.style.background = '#fff';
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'pdfIFrame';
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = '0';
+  iframe.setAttribute('sandbox','allow-same-origin allow-scripts');
+
+  frameWrap.appendChild(iframe);
+  card.appendChild(top);
+  card.appendChild(frameWrap);
+  modal.appendChild(card);
+  document.body.appendChild(modal);
+
+  // close handler
+  modal.querySelector('#pdfClose').addEventListener('click', ()=> {
+    modal.style.display = 'none';
+    // revoke any blob URL inside iframe to save memory
+    const src = iframe.src;
+    try { if (src && src.startsWith('blob:')) URL.revokeObjectURL(src); } catch(e){}
+  });
+  return modal;
+}
+
+// generate pdf handler
+$('#btnGenerate').addEventListener('click', async ()=>{
+  // terms check
+  if (!DRAFT.terms) {
+    alert('Please confirm Terms & Conditions before generating preview.');
+    goTo(13); // index for terms slide
+    return;
+  }
+
+  $('#genStatus').innerHTML = '<div style="display:flex;gap:8px;align-items:center"><div class="loader"></div><div>Rendering preview to PDF…</div></div>';
+  try {
+    const modal = createPdfModal();
+    modal.style.display = 'flex';
+
+    // build offscreen render
+    const renderContainer = $('#pdfRenderContainer');
+    renderContainer.innerHTML = ''; // clear
+
+    // build a styled wrapper (A4-ish)
+    const wrapper = document.createElement('div');
+    wrapper.style.width = '794px';
+    wrapper.style.padding = '28px';
+    wrapper.style.background = '#071425';
+    wrapper.style.borderRadius = '6px';
+    wrapper.style.color = '#eaf2ff';
+    wrapper.style.fontFamily = 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial';
+    wrapper.style.position = 'relative';
+    wrapper.style.boxSizing = 'border-box';
+    wrapper.style.minHeight = '1122px';
+
+    // header
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.gap = '16px';
+    header.style.alignItems = 'center';
+    header.innerHTML = `<div style="width:84px;height:84px;border-radius:14px;background:linear-gradient(135deg, ${DRAFT.accent}, ${shadeColor(DRAFT.accent, 30)});display:grid;place-items:center;font-weight:900;font-size:28px">${escapeHtml((DRAFT.appName||'A').slice(0,2).toUpperCase())}</div>
+      <div style="flex:1">
+        <div style="font-size:20px;font-weight:800;margin-bottom:6px">${escapeHtml(DRAFT.appName || 'App Title')}</div>
+        <div style="color:#9fb0d8">${escapeHtml(DRAFT.developer || 'Developer')} • ${escapeHtml(DRAFT.packageId || 'package.id')} • ${escapeHtml(DRAFT.contentRating || '')}</div>
+      </div>`;
+    wrapper.appendChild(header);
+
+    // main content: left description, right screenshots column
+    const main = document.createElement('div');
+    main.style.display = 'flex';
+    main.style.gap = '16px';
+    main.style.marginTop = '14px';
+
+    const leftCol = document.createElement('div');
+    leftCol.style.flex = '1';
+    leftCol.innerHTML = `<h4 style="margin:4px 0 8px;color:#dfeeff">About the app</h4><div style="color:#9fb0d8;white-space:pre-wrap;line-height:1.4">${escapeHtml(DRAFT.longDesc || DRAFT.shortDesc || 'No description provided.')}</div>`;
+
+    const rightCol = document.createElement('div');
+    rightCol.style.width = '240px';
+    rightCol.innerHTML = `<h4 style="margin:4px 0 8px;color:#dfeeff">Screenshots</h4>`;
+
+    const screenWrap = document.createElement('div');
+    screenWrap.style.display = 'flex';
+    screenWrap.style.flexDirection = 'column';
+    screenWrap.style.gap = '8px';
+    if (DRAFT.screenshots && DRAFT.screenshots.length) {
+      DRAFT.screenshots.slice(0,4).forEach(s => {
+        const img = document.createElement('img');
+        img.src = s;
+        img.style.width = '100%';
+        img.style.borderRadius = '8px';
+        img.style.objectFit = 'cover';
+        screenWrap.appendChild(img);
+      });
+    } else {
+      const noimg = document.createElement('div');
+      noimg.style.color = '#9fb0d8';
+      noimg.textContent = 'No screenshots added';
+      screenWrap.appendChild(noimg);
+    }
+    rightCol.appendChild(screenWrap);
+    main.appendChild(leftCol);
+    main.appendChild(rightCol);
+    wrapper.appendChild(main);
+
+    // pricing/invoice preview
+    const invoice = document.createElement('div');
+    invoice.style.display = 'flex';
+    invoice.style.justifyContent = 'space-between';
+    invoice.style.alignItems = 'center';
+    invoice.style.marginTop = '18px';
+    invoice.innerHTML = `<div style="color:#9fb0d8;font-size:13px">Pricing: ${DRAFT.pricing === 'paid' ? 'INR ' + (DRAFT.price || '0') : 'Free'}</div>
+      <div style="color:#9fb0d8;font-size:12px">Generated: ${new Date().toLocaleString()}</div>`;
+    wrapper.appendChild(invoice);
+
+    // contact & website
+    const contacts = document.createElement('div');
+    contacts.style.marginTop = '18px';
+    contacts.style.display = 'flex';
+    contacts.style.justifyContent = 'space-between';
+    contacts.innerHTML = `<div style="color:#9fb0d8">Support: ${escapeHtml(DRAFT.email || 'support@example.com')}</div><div style="color:#9fb0d8">${escapeHtml(DRAFT.website || '')}</div>`;
+    wrapper.appendChild(contacts);
+
+    // footer text
+    const footer = document.createElement('div');
+    footer.style.position = 'absolute';
+    footer.style.left = '28px';
+    footer.style.bottom = '14px';
+    footer.style.color = '#9fb0d8';
+    footer.style.fontSize = '11px';
+    footer.textContent = DRAFT.footer || `Protected preview — ${new Date().toLocaleString()}`;
+    wrapper.appendChild(footer);
+
+    // forensic watermark overlay
+    const wm = document.createElement('div');
+    wm.style.position = 'absolute';
+    wm.style.inset = '0';
+    wm.style.pointerEvents = 'none';
+    wm.style.display = 'flex';
+    wm.style.alignItems = 'center';
+    wm.style.justifyContent = 'center';
+    wm.style.opacity = '0.12';
+    wm.style.mixBlendMode = 'overlay';
+    wm.style.transform = 'rotate(-18deg)';
+    wm.style.fontWeight = '800';
+    wm.style.letterSpacing = '2px';
+    wm.style.fontSize = '18px';
+    wm.style.color = '#fff';
+    wm.innerText = `${DRAFT.email || 'anonymous'} • ${DRAFT.appName || 'Unnamed'} • ${new Date().toLocaleString()}`;
+    wrapper.appendChild(wm);
+
+    renderContainer.appendChild(wrapper);
+
+    // animate watermark slightly to deter static cropping
+    const wmTimer = setInterval(()=> {
+      wm.style.transform = `translate(${Math.random()*18 - 9}px, ${Math.random()*12 - 6}px) rotate(${ -18 + (Math.random()*8 - 4) }deg)`;
+    }, 2400);
+
+    // wait images to load (screenshots)
+    await ensureImagesLoaded(wrapper, 8000);
+
+    // use html2canvas to rasterize
+    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#071425' });
+    // create a PDF with canvas width/height
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+
+    // add small footer text
+    pdf.setFontSize(10);
+    pdf.setTextColor(150,150,150);
+    pdf.text(DRAFT.footer || `Protected preview — ${new Date().toLocaleString()}`, 14, canvas.height - 10);
+
+    const blob = pdf.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+    // set iframe src
+    const iframe = document.getElementById('pdfIFrame');
+    iframe.src = blobUrl;
+
+    // finalize
+    $('#genStatus').innerHTML = '<div style="color:#9fb0d8">Protected preview generated and embedded. Watermark added for traceability.</div>';
+    // show modal
+    const modal = document.getElementById('pdfModal');
+    modal.style.display = 'flex';
+
+    // cleanup: clear interval on close
+    modal.querySelector('#pdfClose').addEventListener('click', ()=> {
+      clearInterval(wmTimer);
+      try { URL.revokeObjectURL(blobUrl); } catch(e){}
+    });
+
+  } catch(err){
+    console.error('Generation failed', err);
+    $('#genStatus').textContent = 'Failed to generate preview. See console for details.';
+  }
+});
+
+/* ------------------ helper: ensure images loaded ------------------ */
+function ensureImagesLoaded(node, timeout=5000){
+  const imgs = node.querySelectorAll('img');
+  if (!imgs || imgs.length === 0) return Promise.resolve();
+  const promises = [];
+  imgs.forEach(img => {
+    if (img.complete) return;
+    promises.push(new Promise(res => { img.onload = res; img.onerror = res; }));
+  });
+  return Promise.race([Promise.all(promises), new Promise(res => setTimeout(res, timeout))]);
+}
+
+/* ------------------ small utilities ------------------ */
+function escapeHtml(str){
+  if (!str) return '';
+  return String(str).replace(/[&<>"'`=\/]/g, function(s){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[s]);
+  });
+}
+
+/* ------------------ deter captures: disable right-click & blocking shortcuts ------------------ */
+document.addEventListener('contextmenu', e => { e.preventDefault(); });
+window.addEventListener('keydown', function(e){
+  const mod = e.ctrlKey || e.metaKey;
+  // block Ctrl+S, Ctrl+P, Ctrl+Shift+I, F12
+  if (mod && (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P')){ e.preventDefault(); alert('Save/Print disabled in preview.'); }
+  if ((mod && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) || e.key === 'F12'){ e.preventDefault(); alert('Dev tools discouraged while viewing protected previews.'); }
+});
+
+/* ------------------ small helper: set initial focus & goTo start ------------------ */
+goTo(0);
+
+/* ------------------ export draft JSON and quick generate handlers for demo ------------------ */
+$('#btnExportJSON').addEventListener('click', ()=> {
+  const payload = gatherAllFields(true);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  // create temporary link to download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (payload.appName || 'wizard-draft') + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+$('#btnFinishPreview').addEventListener('click', ()=> {
+  // quick generate for demo from last slide
+  $('#btnGenerate').click();
+});
+
+/* ------------------ gather all fields for export or saving ------------------ */
+function gatherAllFields(includeScreenshots=false){
+  const obj = {
+    appName: (qs('f_appName') && qs('f_appName').value) || DRAFT.appName || '',
+    developer: (qs('f_developer') && qs('f_developer').value) || DRAFT.developer || '',
+    packageId: (qs('f_packageId') && qs('f_packageId').value) || DRAFT.packageId || '',
+    category: (qs('f_category') && qs('f_category').value) || DRAFT.category || 'Productivity',
+    contentRating: (qs('f_contentRating') && qs('f_contentRating').value) || DRAFT.contentRating || 'Rated for 3+',
+    shortDesc: (qs('f_shortDesc') && qs('f_shortDesc').value) || DRAFT.shortDesc || '',
+    longDesc: (qs('f_longDesc') && qs('f_longDesc').value) || DRAFT.longDesc || '',
+    lottie: (qs('f_lottieChoice') && qs('f_lottieChoice').value) || DRAFT.lottie || 'none',
+    gif: (qs('f_gifChoice') && qs('f_gifChoice').value) || DRAFT.gif || 'none',
+    icon: DRAFT.icon || null,
+    screenshots: includeScreenshots ? (DRAFT.screenshots ? DRAFT.screenshots.slice() : []) : undefined,
+    email: (qs('f_email') && qs('f_email').value) || DRAFT.email || '',
+    pricing: (qs('f_pricing') && qs('f_pricing').value) || DRAFT.pricing || 'free',
+    price: (qs('f_price') && qs('f_price').value) || DRAFT.price || '',
+    terms: qs('f_terms') && qs('f_terms').checked,
+    accent: (qs('f_accent') && qs('f_accent').value) || DRAFT.accent || '#2b7de9',
+    coupon: (qs('f_coupon') && qs('f_coupon').value) || DRAFT.coupon || '',
+    footer: (qs('f_footer') && qs('f_footer').value) || DRAFT.footer || '',
+    website: (qs('f_website') && qs('f_website').value) || DRAFT.website || ''
+  };
+  return obj;
+}
+
+/* ------------------ auto-save periodically ------------------ */
+setInterval(()=> {
+  // update DRAFT from fields
+  const current = gatherAllFields(true);
+  Object.assign(DRAFT, current);
+  persistDraft();
+}, 3000);
+
+/* ------------------ initial small hydration for inputs to reflect DRAFT if loaded earlier ------------------ */
+// populate inputs if DRAFT loaded
+(function fillInputsFromDraft(){
+  if (!DRAFT) return;
+  try {
+    const mapping = {
+      'f_appName': 'appName', 'f_developer':'developer', 'f_packageId':'packageId',
+      'f_category':'category', 'f_contentRating':'contentRating', 'f_shortDesc':'shortDesc', 'f_longDesc':'longDesc',
+      'f_lottieChoice':'lottie', 'f_gifChoice':'gif', 'f_email':'email', 'f_pricing':'pricing', 'f_price':'price',
+      'f_accent':'accent', 'f_coupon':'coupon', 'f_footer':'footer', 'f_website':'website'
+    };
+    Object.keys(mapping).forEach(k => {
+      const el = qs(k);
+      if (!el) return;
+      if (DRAFT[mapping[k]] !== undefined && DRAFT[mapping[k]] !== null) {
+        el.value = DRAFT[mapping[k]];
+      }
+    });
+    // show thumbnails for screenshots
+    if (DRAFT.screenshots && DRAFT.screenshots.length) {
+      DRAFT.screenshots.forEach(s => addThumbnail(s));
+    }
+    // set checkbox
+    qs('f_terms').checked = DRAFT.terms === true;
+    // price box visibility
+    qs('priceBox').style.display = (DRAFT.pricing === 'paid') ? 'block' : 'none';
+    hydratePreview();
+  } catch(e) { console.warn('hydrate failed', e); }
+})();
+
+/* ------------------ final notes: telemetry & safety ------------------ */
+/*
+  - This implementation uses client-side watermarking and deterrents.
+  - You cannot stop all screenshots or screen recordings with web code.
+  - For stronger protection, use native apps with platform capture-block APIs or server-side DRM/streaming.
+  - The code uses public Lottie/GIF URLs — replace them with your branded assets for production.
+  - The generated PDF is rasterized (JPEG inside PDF) to make text copy harder; still, a determined user can extract images.
+*/
+
+/* ================== End of script ================== */
+</script>
+</body>
+</html>
