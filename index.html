@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Buildora.Ai — Get Your Branded App</title>
+<title>Buildora.Ai</title>
 
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -228,21 +228,23 @@
 
 <main class="container" role="main" aria-labelledby="main-title">
 
-  <!-- fixed compact header (no extra 3 lines) -->
-  <header role="banner" aria-label="Buildora header">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <!-- if logo1.png exists it will show, otherwise fallback initials -->
-        <img src="logo1.png" alt="Buildora logo" onerror="this.style.display='none'">
-        <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:white; font-weight:700; font-size:14px;">B.A</div>
-      </div>
-      <div class="title">
-        <h1 id="main-title">Buildora.Ai</h1>
-        <p>Premium App Development</p>
-      </div>
+<!-- fixed compact header (no extra 3 lines) -->
+<header role="banner" aria-label="Buildora header">
+  <div class="brand" style="display:flex; align-items:center; gap:10px;">
+    <div class="logo" aria-hidden="true" style="width:48px; height:48px; position:relative; border-radius:8px; overflow:hidden; background:#222;">
+      <!-- if 1.png exists it will show, otherwise fallback initials -->
+      <img src="1.png" alt="Buildora logo"
+           style="width:100%; height:100%; object-fit:cover; display:block;"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div style="display:none; align-items:center; justify-content:center; width:100%; height:100%; color:white; font-weight:700; font-size:14px;">B.A</div>
     </div>
-    <!-- intentionally removed extra 3-line text per your request -->
-  </header>
+    <div class="title" style="display:flex; flex-direction:column; line-height:1.2;">
+      <h1 id="main-title" style="margin:0; font-size:16px; color:#fff;">Buildora.Ai</h1>
+      <p style="margin:0; font-size:12px; color:#ccc;">Get your Premium Branded App</p>
+    </div>
+  </div>
+  <!-- intentionally removed extra 3-line text per your request -->
+</header>
 
   <!-- hero -->
   <section class="card hero" aria-hidden="false">
@@ -426,3 +428,4 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverl
 
 </body>
 </html>
+
