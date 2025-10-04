@@ -2,153 +2,161 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Buildora.Ai — Get Your Branded App</title>
 
 <!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<!-- Razorpay checkout script (required) -->
+<!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <!-- Lottie -->
 <script src="https://unpkg.com/lottie-web@5.10.2/build/player/lottie.min.js"></script>
 
 <style>
   :root{
-    --bg1: #0f1114;
+    --bg1: #0b0f14;
     --bg2: #071018;
-    --card-bg: rgba(255,255,255,0.04);
-    --muted: #bfc7cf;
-    --orange: #ff6a00;
-    --orange-2: #ff8c3a;
-    --glass: rgba(255,255,255,0.02);
-    --max-width: 900px;
-    --radius: 16px;
+    --muted: #b7c0c8;
+    --accent1: #ff6a00;
+    --accent2: #ff8c3a;
+    --radius: 12px;
+    --container-max: 980px;
+    --header-height: 64px;
     font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    --base-size: 14px; /* smaller base for compact look */
   }
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
+  /* reset + base */
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
   body{
-    margin:0;
-    min-height:100%;
-    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 60%);
-    color:#e9eef6;
+    background: linear-gradient(160deg,var(--bg1) 0%, var(--bg2) 60%);
+    color: #eaf0f6;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:center;
-    padding:20px;
+    padding:12px;
+    font-size:var(--base-size);
+    line-height:1.28;
   }
 
-  .wrap{
+  /* container */
+  .container{
     width:100%;
-    max-width:var(--max-width);
+    max-width:var(--container-max);
     display:flex;
-    flex-direction:column; /* single column, stacked top->down */
-    gap:18px;
+    flex-direction:column;
+    gap:12px;
     align-items:stretch;
   }
 
+  /* fixed compact header */
   header{
+    position:sticky;
+    top:12px;
+    z-index:150;
+    height:var(--header-height);
     display:flex;
     align-items:center;
-    justify-content:space-between;
     gap:12px;
+    padding:8px 12px;
+    border-radius:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.55);
+    backdrop-filter: blur(6px);
   }
 
   .brand{
     display:flex;
-    gap:12px;
+    gap:10px;
     align-items:center;
   }
 
-  .logo-img{
-    width:56px;
-    height:56px;
-    object-fit:contain;
+  .logo{
+    width:48px;
+    height:48px;
     border-radius:10px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-2));
-    padding:8px;
-    box-shadow: 0 6px 24px rgba(255,106,0,0.12), inset 0 -2px 6px rgba(0,0,0,0.2);
-  }
-
-  .logo-fallback{
-    width:56px;
-    height:56px;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
-    border-radius:12px;
-    font-weight:800;
-    color:white;
-    font-size:18px;
-    letter-spacing:0.6px;
-    background: linear-gradient(135deg, var(--orange), var(--orange-2));
-    box-shadow: 0 6px 24px rgba(255,106,0,0.12), inset 0 -2px 6px rgba(0,0,0,0.2);
+    overflow:hidden;
+    background: linear-gradient(135deg,var(--accent1),var(--accent2));
+    box-shadow: 0 6px 16px rgba(255,106,0,0.12);
+    flex:0 0 48px;
   }
+  .logo img{ width:100%; height:100%; object-fit:contain; display:block; }
 
-  .brand h1{
-    font-size:18px;
-    margin:0;
-    color: #fff;
-    letter-spacing:0.2px;
+  .title{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
   }
-  .brand p{margin:0; font-size:12px; color:var(--muted)}
+  .title h1{ font-size:15px; margin:0; font-weight:700; color:#fff; letter-spacing:0.2px; }
+  .title p{ font-size:11px; color:var(--muted); margin:0; }
 
+  /* card */
   .card{
     background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius: var(--radius);
-    padding:20px;
-    box-shadow: 0 8px 40px rgba(2,6,23,0.6), 0 1px 0 rgba(255,255,255,0.02) inset;
-    border: 1px solid rgba(255,255,255,0.03);
+    border-radius:12px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 10px 40px rgba(2,6,23,0.6);
     backdrop-filter: blur(6px);
   }
 
-  /* HERO (top) */
+  /* hero */
   .hero{
     display:flex;
     flex-direction:column;
-    gap:14px;
-    align-items:center;
-    justify-content:center;
-    padding:14px;
-    border-radius: var(--radius);
-    position:relative;
-    overflow:visible;
+    gap:10px;
+    align-items:stretch;
   }
 
   .hero-media{
     width:100%;
-    max-width:880px;
-    border-radius:12px;
+    border-radius:10px;
     overflow:hidden;
-    box-shadow: 0 12px 40px rgba(2,6,23,0.6);
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-    min-height:220px;
+    min-height:160px;
     display:flex;
     align-items:center;
     justify-content:center;
+    background:rgba(255,255,255,0.01);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
   }
 
   #lottie{
     width:100%;
-    height:360px;
-    max-height:420px;
+    height:320px;
+    max-height:340px;
     display:flex;
     align-items:center;
     justify-content:center;
-    background: transparent;
+    background:transparent;
   }
 
-  /* Purchase (below hero) */
+  .headline{
+    font-size:17px;
+    font-weight:700;
+    color:#fff;
+    text-align:center;
+  }
+  .sub{
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+  }
+
+  /* purchase area */
   .purchase{
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
     align-items:stretch;
+    padding:10px;
   }
 
   .price-row{
@@ -156,289 +164,166 @@
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    flex-wrap:wrap;
   }
-
   .price{
-    font-size:20px;
+    font-size:16px;
     font-weight:800;
-    color:var(--orange);
-    background: linear-gradient(90deg, rgba(255,106,0,0.08), rgba(255,140,58,0.04));
-    padding:8px 12px;
-    border-radius:10px;
-    box-shadow: 0 6px 18px rgba(255,106,0,0.08);
+    color:var(--accent1);
+    background: linear-gradient(90deg, rgba(255,106,0,0.06), rgba(255,140,58,0.03));
+    padding:6px 10px;
+    border-radius:8px;
   }
-  .strike{
-    text-decoration:line-through;
-    color:#9aa5b1;
-    font-weight:600;
-    font-size:14px;
-  }
+  .strike{ font-size:12px; color:#98a3ab; text-decoration:line-through; }
 
-  .headline{
-    font-size:20px;
-    font-weight:700;
-    margin:6px 0;
-    line-height:1.12;
-    color: #fff;
-  }
-  .subtext{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:8px;
-  }
-
-  .features{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:8px;
-  }
-  .chip{
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.02);
-    padding:8px 12px;
-    border-radius:999px;
-    font-size:13px;
-    color:var(--muted);
-  }
-
-  .pay-wrap{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-top:6px;
-  }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .chip{ font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted); border:1px solid rgba(255,255,255,0.02); }
 
   .btn-pay{
     width:100%;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    padding:14px 18px;
-    border-radius:12px;
-    font-weight:700;
-    font-size:15px;
-    color:white;
-    background: linear-gradient(90deg, var(--orange), var(--orange-2));
+    padding:12px 14px;
+    border-radius:10px;
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#fff;
     border: none;
+    font-weight:700;
+    font-size:14px;
     cursor:pointer;
-    box-shadow: 0 12px 30px rgba(255,108,15,0.18);
-    transition: transform .18s ease, box-shadow .18s ease, opacity .12s ease;
+    box-shadow: 0 10px 28px rgba(255,108,15,0.12);
   }
-  .btn-pay:active{ transform: translateY(1px) scale(.998) }
-  .btn-pay[disabled]{ opacity:.6; cursor:not-allowed; transform:none; box-shadow:none }
+  .btn-pay[disabled]{ opacity:0.6; cursor:not-allowed; }
 
-  .small{
-    font-size:12px;
-    color:var(--muted);
-  }
+  .small{ font-size:12px; color:var(--muted); }
 
-  .footer-note{
-    margin-top:10px;
-    font-size:13px;
-    color:var(--muted);
-    border-top:1px dashed rgba(255,255,255,0.02);
-    padding-top:12px;
-  }
+  .footer-note{ font-size:12px; color:var(--muted); border-top:1px dashed rgba(255,255,255,0.02); padding-top:10px; margin-top:6px; }
 
-  /* success overlay */
+  /* overlay success */
   .overlay{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: rgba(2,6,23,0.6);
-    z-index:90;
-    padding:28px;
-    visibility:hidden;
-    opacity:0;
-    transition:opacity .28s ease, visibility .28s;
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background: rgba(2,6,23,0.6); z-index:220; visibility:hidden; opacity:0; transition:opacity .22s;
   }
-  .overlay.show{ visibility:visible; opacity:1 }
+  .overlay.show{ visibility:visible; opacity:1; }
 
-  .thank{
-    max-width:680px;
-    width:100%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:14px;
-    padding:24px;
-    text-align:center;
-    box-shadow: 0 20px 80px rgba(2,6,23,0.7);
-  }
-  .thank h2{ margin:0 0 8px 0; color:#fff }
-  .thank p{ margin:0 0 18px 0; color:var(--muted) }
+  .thank{ width:calc(100% - 40px); max-width:520px; text-align:center; padding:16px; border-radius:10px; }
 
-  .trust{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    justify-content:center;
-    color:var(--muted);
-    font-size:13px;
-    margin-top:8px;
+  /* smaller screens */
+  @media (max-width:520px){
+    :root{ --header-height:60px; --base-size:13px; }
+    header{ height:var(--header-height); padding:8px; }
+    .logo{ width:44px; height:44px; flex:0 0 44px; }
+    .title h1{ font-size:14px; }
+    #lottie{ height:220px; max-height:260px; }
+    .headline{ font-size:15px; }
+    .price{ font-size:15px; }
   }
 
-  /* floating animation for hero media */
-  @keyframes floaty {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0px); }
-  }
-  .hero-media { animation: floaty 7s ease-in-out infinite; }
-
-  /* Responsive tweaks */
-  @media (max-width:720px){
-    body{ padding:14px }
-    .logo-img, .logo-fallback{ width:48px; height:48px }
-    #lottie{ height:260px }
-    .headline{ font-size:18px }
-    .price{ font-size:18px }
-  }
-  @media (max-width:420px){
-    #lottie{ height:200px }
-    .card{ padding:16px }
-    .hero-media{ min-height:160px }
-    .brand h1{ font-size:16px }
+  @media (max-width:360px){
+    #lottie{ height:180px; max-height:220px; }
+    .title h1{ font-size:13px; }
+    .sub, .small, .footer-note{ font-size:11px; }
+    .btn-pay{ font-size:13px; padding:10px; }
   }
 </style>
 </head>
 <body>
 
-<main class="wrap" role="main" aria-labelledby="main-title">
+<main class="container" role="main" aria-labelledby="main-title">
 
-  <header>
+  <!-- fixed compact header (no extra 3 lines) -->
+  <header role="banner" aria-label="Buildora header">
     <div class="brand">
-      <!-- If you add `logo1.png` to the same folder, it will be used. Otherwise the fallback box (B.A) will show. -->
-      <img src="logo1.png" alt="Buildora.Ai logo" class="logo-img" onerror="this.style.display='none'">
-      <div class="logo-fallback" aria-hidden="true" style="margin-left:0; display:flex;">
-        B.A
+      <div class="logo" aria-hidden="true">
+        <!-- if logo1.png exists it will show, otherwise fallback initials -->
+        <img src="logo1.png" alt="Buildora logo" onerror="this.style.display='none'">
+        <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:white; font-weight:700; font-size:14px;">B.A</div>
       </div>
-
-      <div>
+      <div class="title">
         <h1 id="main-title">Buildora.Ai</h1>
-        <p>Premium App Development • Trusted • Fast</p>
+        <p>Premium App Development</p>
       </div>
     </div>
-
-    <div style="text-align:right">
-      <small style="color:var(--muted)">Secure payments • 30-day support • NDA available</small>
-    </div>
+    <!-- intentionally removed extra 3-line text per your request -->
   </header>
 
-  <!-- HERO (now full width, top) -->
+  <!-- hero -->
   <section class="card hero" aria-hidden="false">
-    <div class="hero-media" title="Buildora.Ai demo animation">
-      <!-- Lottie container. If you prefer to show a big GIF instead, the JS below will load it (BIG_GIF_URL) -->
-      <div id="lottie" role="img" aria-label="Futuristic app download animation">
-        <!-- Lottie animation or GIF will load here. -->
-      </div>
+    <div class="hero-media" role="img" aria-label="Animation area">
+      <div id="lottie" aria-hidden="false"></div>
     </div>
 
-    <div style="width:100%; text-align:center; margin-top:6px;">
+    <div>
       <div class="headline">Get Your Branded App Now for ₹25,999 Only!</div>
-      <div class="subtext" style="max-width:760px; margin:6px auto 0;">
-        After payment is confirmed our team will contact you to gather full project details and timelines. Choose secure checkout below.
-      </div>
+      <div class="sub">After payment is confirmed our team will contact you to gather full project details and timelines.</div>
     </div>
   </section>
 
-  <!-- PURCHASE (stacked below hero) -->
-  <aside class="card purchase" aria-labelledby="purchase-heading">
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div class="price-row">
-        <div class="price">Limited Offer • ₹25,999</div>
-        <div class="strike">₹39,999</div>
-      </div>
-
-      <div>
-        <div class="features" aria-hidden="true">
-          <div class="chip">iOS + Android-ready</div>
-          <div class="chip">UI/UX + Launch Assets</div>
-          <div class="chip">2 months support</div>
-          <div class="chip">NDA available</div>
-        </div>
-      </div>
-
-      <div class="small">Price is one-time. No hidden fees. Pay securely via Razorpay.</div>
-
-      <div class="pay-wrap" style="margin-top:6px">
-        <button id="payBtn" class="btn-pay" aria-live="polite" aria-busy="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M3 12h18" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 6h18" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>
-            <path d="M3 18h18" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>
-          </svg>
-          Pay Securely via Razorpay
-        </button>
-      </div>
-
-      <div class="trust" aria-hidden="true">
-        <span>🔒 Secure checkout</span>
-        <span>•</span>
-        <span>24/7 support</span>
-      </div>
-
-      <div class="footer-note">
-        After payment you'll see a confirmation on screen and receive a payment id. Our team will then reach out to gather app details and next steps.
-      </div>
+  <!-- purchase -->
+  <section class="card purchase" aria-labelledby="purchase-heading">
+    <div class="price-row" role="group" aria-label="Price">
+      <div class="price">Limited Offer • ₹25,999</div>
+      <div class="strike">₹39,999</div>
     </div>
-  </aside>
+
+    <div class="chips" aria-hidden="true">
+      <div class="chip">iOS + Android-ready</div>
+      <div class="chip">UI/UX + Launch Assets</div>
+      <div class="chip">2 months support</div>
+      <div class="chip">NDA available</div>
+    </div>
+
+    <div class="small">Price is one-time. No hidden fees. Pay securely via Razorpay.</div>
+
+    <div style="margin-top:8px;">
+      <button id="payBtn" class="btn-pay" aria-live="polite" aria-busy="false">
+        Pay Securely via Razorpay — ₹25,999
+      </button>
+    </div>
+
+    <div class="footer-note">
+      After payment you'll see a confirmation on screen and receive a payment id. Our team will then reach out to gather app details and next steps.
+    </div>
+  </section>
 
 </main>
 
-<!-- SUCCESS OVERLAY -->
+<!-- overlay -->
 <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="thank" role="document">
-    <svg width="78" height="78" viewBox="0 0 24 24" style="margin-bottom:10px" aria-hidden="true">
+  <div class="card thank" role="document">
+    <svg width="60" height="60" viewBox="0 0 24 24" aria-hidden="true" style="margin-bottom:8px;">
       <circle cx="12" cy="12" r="10" fill="url(#g)"></circle>
-      <defs>
-        <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff6a00"/><stop offset="1" stop-color="#ff8c3a"/></linearGradient>
-      </defs>
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff6a00"/><stop offset="1" stop-color="#ff8c3a"/></linearGradient></defs>
     </svg>
-
-    <h2>Payment successful!</h2>
-    <p id="thank-sub">Our team will reach out shortly to gather your project details.</p>
-    <div style="margin-top:14px;">
-      <button onclick="closeOverlay()" class="btn-pay" style="background:linear-gradient(90deg,#2e2e2e,#3a3a3a); box-shadow:none;">
-        Okay, thanks
-      </button>
+    <h2 style="font-size:16px; margin-bottom:6px;">Payment successful!</h2>
+    <p id="thank-sub" style="color:var(--muted); font-size:13px; margin-bottom:10px;">Our team will reach out shortly to gather your project details.</p>
+    <div>
+      <button onclick="closeOverlay()" class="btn-pay" style="background:linear-gradient(90deg,#2e2e2e,#3a3a3a); box-shadow:none;">Okay, thanks</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ======================
-   CONFIG / EASY CHANGES
-   ======================
-   - Replace RAZORPAY_KEY_HERE with your Razorpay key (test/live).
-   - Replace LOTTIE_JSON_URL_HERE with a Lottie JSON URL (public URL), or set BIG_GIF_URL to show a big GIF.
-   - You can also place `logo1.png` and a big gif file in the same folder and name them accordingly.
+/* === CONFIG ===
+ - Replace placeholders below:
+   const RAZORPAY_KEY = "RAZORPAY_KEY_HERE";
+   const LOTTIE_JSON_URL = "LOTTIE_JSON_URL_HERE";
+   const BIG_GIF_URL = "BIG_GIF_URL_HERE";
+ - Put logo1.png next to this file if you want custom logo.
 */
 
-const PRICE_DISPLAY = "₹25,999";
 const PRICE_RUPEES = 25999;
-const CURRENCY = "INR";
 const PRICE_PAISA = PRICE_RUPEES * 100;
+const CURRENCY = "INR";
+const RAZORPAY_KEY = "RAZORPAY_KEY_HERE"; // <-- replace
+const LOTTIE_JSON_URL = "LOTTIE_JSON_URL_HERE"; // <-- optional
+const BIG_GIF_URL = "BIG_GIF_URL_HERE"; // <-- optional
+const FALLBACK_GIF = "https://media.giphy.com/media/3orieY3q3JqQ6f2hfa/giphy.gif";
 
-/* Replace with your Razorpay Key */
-const RAZORPAY_KEY = "RAZORPAY_KEY_HERE"; // <-- INSERT YOUR RAZORPAY KEY HERE
-
-/* Lottie or big GIF */
-const LOTTIE_JSON_URL = "LOTTIE_JSON_URL_HERE"; // <-- INSERT LOTTIE JSON URL HERE (recommended)
-const BIG_GIF_URL = "BIG_GIF_URL_HERE";         // <-- INSERT a big GIF URL here (optional fallback)
-const DEFAULT_FALLBACK_GIF = "https://media.giphy.com/media/3orieY3q3JqQ6f2hfa/giphy.gif";
-
-/* Load Lottie JSON if provided; otherwise show BIG_GIF_URL or fallback gif */
-(function loadAnimation(){
+/* Load animation (Lottie preferred; big gif if provided) */
+(function loadAnim(){
   const holder = document.getElementById('lottie');
+  const hasBigGif = BIG_GIF_URL && BIG_GIF_URL.indexOf('http') === 0 && !BIG_GIF_URL.includes('BIG_GIF_URL_HERE');
+  const hasLottie = LOTTIE_JSON_URL && LOTTIE_JSON_URL.indexOf('http') === 0 && !LOTTIE_JSON_URL.includes('LOTTIE_JSON_URL_HERE');
 
-  // prefer GIF if BIG_GIF_URL is provided and looks valid
-  const useBigGif = BIG_GIF_URL && BIG_GIF_URL.indexOf('http') === 0 && !BIG_GIF_URL.includes('BIG_GIF_URL_HERE');
-
-  if (!useBigGif && LOTTIE_JSON_URL && LOTTIE_JSON_URL.indexOf("http") === 0 && !LOTTIE_JSON_URL.includes("LOTTIE_JSON_URL_HERE")) {
+  if (hasLottie && !hasBigGif) {
     try {
       lottie.loadAnimation({
         container: holder,
@@ -448,24 +333,21 @@ const DEFAULT_FALLBACK_GIF = "https://media.giphy.com/media/3orieY3q3JqQ6f2hfa/g
         path: LOTTIE_JSON_URL
       });
     } catch (err) {
-      console.warn("Lottie failed to load, using fallback gif", err);
-      showGif(useBigGif ? BIG_GIF_URL : DEFAULT_FALLBACK_GIF);
+      console.warn("Lottie error, falling back to GIF", err);
+      showGif(hasBigGif ? BIG_GIF_URL : FALLBACK_GIF);
     }
   } else {
-    // show the big gif (preferred) or default fallback
-    showGif(useBigGif ? BIG_GIF_URL : DEFAULT_FALLBACK_GIF);
+    showGif(hasBigGif ? BIG_GIF_URL : FALLBACK_GIF);
   }
 
   function showGif(url){
-    holder.innerHTML = `<img alt="animation" src="${url}" style="width:100%; height:100%; object-fit:cover; display:block;" />`;
+    holder.innerHTML = `<img alt="animation" src="${url}" style="width:100%; height:100%; object-fit:cover; display:block;">`;
   }
 })();
 
-/* Razorpay payment flow */
-document.getElementById('payBtn').addEventListener('click', openCheckout);
-
-function openCheckout(){
-  const btn = document.getElementById('payBtn');
+/* Razorpay - client-side integration (remember to verify server-side for production) */
+document.getElementById('payBtn').addEventListener('click', function openCheckout(){
+  const btn = this;
   btn.setAttribute('disabled','true');
   btn.setAttribute('aria-busy','true');
 
@@ -475,22 +357,14 @@ function openCheckout(){
     currency: CURRENCY,
     name: "Buildora.Ai",
     description: "Premium Branded App - One-time fee",
-    image: "logo1.png", // will attempt to use your local logo1.png
-    handler: function (response){
-        showSuccess(response);
-        // IMPORTANT: verify payment server-side before enabling delivery.
+    image: "logo1.png",
+    handler: function(response){
+      showSuccess(response);
+      // IMPORTANT: verify payment signature on your server.
     },
-    prefill: {
-      name: "",
-      email: "",
-      contact: ""
-    },
-    notes: {
-      plan: "Premium Branded App"
-    },
-    theme: {
-      color: "#ff6a00"
-    },
+    prefill: { name:"", email:"", contact:"" },
+    notes: { plan: "Premium Branded App" },
+    theme: { color: "#ff6a00" },
     modal: {
       ondismiss: function(){
         btn.removeAttribute('disabled');
@@ -502,63 +376,52 @@ function openCheckout(){
   try {
     const rzp = new Razorpay(options);
     rzp.open();
-
-    rzp.on('payment.failed', function (response){
-      console.error("Payment failed:", response);
+    rzp.on('payment.failed', function(resp){
+      console.error('Payment failed', resp);
       btn.removeAttribute('disabled');
       btn.setAttribute('aria-busy','false');
       alert('Payment failed or canceled. Please try again or contact support.');
     });
-  } catch (e) {
-    console.error(e);
-    alert("Could not initialize payment. Please check your Razorpay key and console for errors.");
+  } catch (err) {
+    console.error(err);
+    alert('Could not initialize payment. Check your Razorpay key and console.');
     btn.removeAttribute('disabled');
     btn.setAttribute('aria-busy','false');
   }
-}
+});
 
-/* Show success overlay */
+/* success overlay */
 function showSuccess(response){
   const overlay = document.getElementById('overlay');
   const sub = document.getElementById('thank-sub');
-
   if (response && response.razorpay_payment_id) {
-    sub.innerHTML = `Payment successful! Our team will reach out shortly to gather your project details.<br/><small style="color:var(--muted)">Payment ID: <strong>${response.razorpay_payment_id}</strong></small>`;
+    sub.innerHTML = `Payment successful! Payment ID: <strong style="color:#fff;">${response.razorpay_payment_id}</strong>`;
   } else {
-    sub.textContent = "Payment successful! Our team will reach out shortly to gather your project details.";
+    sub.textContent = "Payment successful! Our team will reach out shortly.";
   }
-
   overlay.classList.add('show');
   overlay.setAttribute('aria-hidden','false');
-
   const btn = document.getElementById('payBtn');
   btn.removeAttribute('disabled');
   btn.setAttribute('aria-busy','false');
-
-  // TODO: Send payment info to your server for verification & create an internal lead/ticket
-  // Example:
-  // fetch('/verify-payment', { method:'POST', body: JSON.stringify(response), headers:{'Content-Type':'application/json'}})
+  // TODO: POST response to your server for verification & lead creation.
 }
 
-/* Close overlay */
+/* close overlay */
 function closeOverlay(){
   const overlay = document.getElementById('overlay');
   overlay.classList.remove('show');
   overlay.setAttribute('aria-hidden','true');
 }
 
-/* Allow Esc to close overlay */
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeOverlay();
-});
+/* ESC to close */
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
 </script>
 
-<!--
-  NOTES:
-  - This file is single-column (top-down) and mobile-first.
-  - Place `logo1.png` in the same folder as this HTML to use your logo automatically.
-  - To show a large GIF instead of Lottie, set BIG_GIF_URL (or leave LOTTIE_JSON_URL empty).
-  - For production: create Razorpay Order server-side and verify the signature after payment.
+<!-- Notes:
+  - Single-column top->down layout, compact fonts for better fit on mobiles.
+  - Remove/empty LOTTIE_JSON_URL to prefer big GIF (BIG_GIF_URL). If you have local gif, set BIG_GIF_URL to "big.gif".
+  - For production: create an order server-side with Razorpay Orders API and verify payment signature server-side.
 -->
 
 </body>
