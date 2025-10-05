@@ -8,8 +8,6 @@
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<!-- Razorpay core (payment-button uses this) -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <!-- Lottie -->
 <script src="https://unpkg.com/lottie-web@5.10.2/build/player/lottie.min.js"></script>
 
@@ -32,8 +30,6 @@
   body{
     background: linear-gradient(160deg,var(--bg1) 0%, var(--bg2) 60%);
     color: #eaf0f6;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
     display:flex;
     align-items:flex-start;
     justify-content:center;
@@ -78,7 +74,7 @@
   .card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:12px; border:1px solid rgba(255,255,255,0.03); box-shadow: 0 10px 40px rgba(2,6,23,0.6); backdrop-filter: blur(6px); }
 
   .hero{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
-  .hero-media{ width:100%; border-radius:10px; overflow:hidden; min-height:160px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.01); box-shadow: inset 0 1px 0 rgba(255,255,255,0.01); }
+  .hero-media{ width:100%; border-radius:10px; overflow:hidden; min-height:160px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.01); }
 
   #lottie{ width:100%; height:320px; max-height:340px; display:flex; align-items:center; justify-content:center; background:transparent; }
 
@@ -94,11 +90,28 @@
   .chip{ font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted); border:1px solid rgba(255,255,255,0.02); }
 
   .small{ font-size:12px; color:var(--muted); }
-  .footer-note{ font-size:12px; color:var(--muted); border-top:1px dashed rgba(255,255,255,0.02); padding-top:10px; margin-top:6px; }
 
-  .overlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(2,6,23,0.6); z-index:220; visibility:hidden; opacity:0; transition:opacity .22s; }
-  .overlay.show{ visibility:visible; opacity:1; }
-  .thank{ width:calc(100% - 40px); max-width:520px; text-align:center; padding:16px; border-radius:10px; }
+  /* Connect button */
+  .btn-connect {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    max-width:420px;
+    min-height:48px;
+    padding:12px 16px;
+    border-radius:10px;
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#fff;
+    font-weight:800;
+    font-size:15px;
+    border:none;
+    box-shadow: 0 10px 28px rgba(255,108,15,0.12);
+    cursor:pointer;
+    transition:transform 0.2s;
+  }
+  .btn-connect:hover { transform:scale(1.03); }
 
   @media (max-width:520px){
     :root{ --header-height:60px; --base-size:13px; }
@@ -113,45 +126,37 @@
   @media (max-width:360px){
     #lottie{ height:180px; max-height:220px; }
     .title h1{ font-size:13px; }
-    .sub, .small, .footer-note{ font-size:11px; }
-    .btn-pay{ font-size:13px; padding:10px; }
+    .sub, .small{ font-size:11px; }
+    .btn-connect{ font-size:13px; padding:10px; }
   }
 
-  /* Payment embed container */
-  .payment-embed {
+  /* overlay for email gif */
+  .overlay {
+    position:fixed;
+    inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    margin-top:8px;
-    width:100%;
+    background: rgba(2,6,23,0.7);
+    z-index:220;
+    visibility:hidden;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .overlay.show { visibility:visible; opacity:1; }
+  .email-gif {
+    width:160px;
+    max-width:45vw;
+    height:auto;
+    border-radius:16px;
+    object-fit:contain;
+    animation: bounce 1.2s infinite ease-in-out;
   }
 
-  /* Style the injected razorpay button to match your theme */
-  .razorpay-payment-button {
-    display:inline-flex !important;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    width:100% !important;
-    max-width:420px;
-    min-height:48px;
-    padding:12px 16px !important;
-    border-radius:10px !important;
-    background: linear-gradient(90deg,var(--accent1),var(--accent2));
-    color:#fff !important;
-    font-weight:800 !important;
-    font-size:15px !important;
-    text-decoration:none !important;
-    border:none !important;
-    box-shadow: 0 10px 28px rgba(255,108,15,0.12) !important;
-    cursor:pointer !important;
+  @keyframes bounce {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-8px); }
   }
-
-  /* icon inside button if Razorpay injects an icon */
-  .razorpay-payment-button svg { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25)); }
-
-  /* small accessibility hint text */
-  .payment-hint { font-size:12px; color:var(--muted); text-align:center; margin-top:8px; }
 </style>
 </head>
 <body>
@@ -159,23 +164,21 @@
 <main class="container" role="main" aria-labelledby="main-title">
 
 <header role="banner" aria-label="Buildora header">
-  <div class="brand" style="display:flex; align-items:center; gap:10px;">
-    <div class="logo" aria-hidden="true" style="width:48px; height:48px; position:relative; border-radius:8px; overflow:hidden; background:#222;">
-      <img src="1.png" alt="Buildora logo"
-           style="width:100%; height:100%; object-fit:cover; display:block;"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <img src="1.png" alt="Buildora logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
       <div style="display:none; align-items:center; justify-content:center; width:100%; height:100%; color:white; font-weight:700; font-size:14px;">B.A</div>
     </div>
-    <div class="title" style="display:flex; flex-direction:column; line-height:1.2;">
-      <h1 id="main-title" style="margin:0; font-size:16px; color:#fff;">Buildora.Ai</h1>
-      <p style="margin:0; font-size:12px; color:#ccc;">Get your Premium Branded App</p>
+    <div class="title">
+      <h1 id="main-title">Buildora.Ai</h1>
+      <p>Get your Premium Branded App</p>
     </div>
   </div>
 </header>
 
-<section class="card hero" aria-hidden="false">
-  <div class="hero-media" role="img" aria-label="Animation area">
-    <div id="lottie" aria-hidden="false"></div>
+<section class="card hero">
+  <div class="hero-media">
+    <div id="lottie"></div>
   </div>
 
   <div>
@@ -184,105 +187,60 @@
   </div>
 </section>
 
-<section class="card purchase" aria-labelledby="purchase-heading">
-  <div class="price-row" role="group" aria-label="Price">
+<section class="card purchase">
+  <div class="price-row">
     <div class="price">Limited Offer • ₹25,999</div>
     <div class="strike">₹89,999</div>
   </div>
 
-  <div class="chips" aria-hidden="true">
+  <div class="chips">
     <div class="chip">Android-ready</div>
     <div class="chip">UI/UX + Launch Assets</div>
     <div class="chip">2 months support</div>
     <div class="chip">Source Code</div>
   </div>
 
-  <div class="small">Price is one-time. No hidden fees. Pay securely via Razorpay.</div>
+  <div class="small">Connect with us directly to proceed with your app.</div>
 
-  <div class="payment-embed" aria-live="polite">
-    <!-- YOUR RAZORPAY QUICK-PAY BUTTON -->
-    <form style="width:100%; max-width:420px; display:block; margin:0 auto;">
-      <script src="https://checkout.razorpay.com/v1/payment-button.js"
-              data-payment_button_id="pl_RPTXOurzFOjBWU"
-              async>
-      </script>
-    </form>
+  <div style="display:flex; align-items:center; justify-content:center; margin-top:8px;">
+    <button class="btn-connect" onclick="openEmail()">Connect with Us</button>
   </div>
 </section>
 
 </main>
 
-<!-- overlay -->
-<div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="card thank" role="document">
-    <svg width="60" height="60" viewBox="0 0 24 24" aria-hidden="true" style="margin-bottom:8px;">
-      <circle cx="12" cy="12" r="10" fill="url(#g)"></circle>
-      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff6a00"/><stop offset="1" stop-color="#ff8c3a"/></linearGradient></defs>
-    </svg>
-    <h2 style="font-size:16px; margin-bottom:6px;">Payment successful!</h2>
-    <p id="thank-sub" style="color:var(--muted); font-size:13px; margin-bottom:10px;">Our team will reach out shortly to gather your project details.</p>
-    <div>
-      <button onclick="closeOverlay()" class="btn-pay" style="background:linear-gradient(90deg,#2e2e2e,#3a3a3a); box-shadow:none;">Okay, thanks</button>
-    </div>
-  </div>
+<!-- Overlay for email animation -->
+<div id="overlay" class="overlay">
+  <img src="email.gif" alt="Sending Email..." class="email-gif" id="emailGif">
 </div>
 
 <script>
-/* Lottie + fallback loader */
+/* Lottie Animation (Fallback if not provided) */
 (function loadAnim(){
   const holder = document.getElementById('lottie');
   const FALLBACK_GIF = "https://media.giphy.com/media/3orieY3q3JqQ6f2hfa/giphy.gif";
-  const LOTTIE_JSON_URL = ""; // optional: fill with your Lottie JSON URL
-  const BIG_GIF_URL = "";     // optional: your own gif (local or remote)
-
-  const hasBigGif = BIG_GIF_URL && BIG_GIF_URL.indexOf('http') === 0;
-  const hasLottie = LOTTIE_JSON_URL && LOTTIE_JSON_URL.indexOf('http') === 0;
-
-  if (hasLottie && !hasBigGif) {
-    try {
-      lottie.loadAnimation({
-        container: holder,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: LOTTIE_JSON_URL
-      });
-    } catch (err) {
-      console.warn("Lottie error, falling back to GIF", err);
-      showGif(hasBigGif ? BIG_GIF_URL : FALLBACK_GIF);
-    }
-  } else {
-    showGif(hasBigGif ? BIG_GIF_URL : FALLBACK_GIF);
-  }
-
-  function showGif(url){
-    holder.innerHTML = `<img alt="animation" src="${url}" style="width:100%; height:100%; object-fit:cover; display:block;">`;
-  }
+  holder.innerHTML = `<img alt="animation" src="${FALLBACK_GIF}" style="width:100%; height:100%; object-fit:cover;">`;
 })();
 
-/* overlay controls (keeps the overlay available if you want to show it on successful payment manually) */
-function showSuccessMessage(text){
+/* Email Button Logic */
+function openEmail(){
   const overlay = document.getElementById('overlay');
-  const sub = document.getElementById('thank-sub');
-  sub.innerHTML = text || "Payment successful! Our team will reach out shortly.";
   overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-}
-function closeOverlay(){
-  const overlay = document.getElementById('overlay');
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-}
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
 
-/*
- Note:
- - The Razorpay Payment Button handles rendering and checkout. After payment completes,
-   Razorpay shows its own confirmation. If you want to intercept and display your overlay,
-   you'll need backend verification or use webhooks (recommended for production).
- - This setup is intended for direct embed (no backend). For real production usage securely
-   verify payments server-side (Orders API + signature verification).
-*/
+  // Detect actual GIF duration if known (fallback 2s per loop)
+  const gifDuration = 2000; // 2 seconds per loop typical
+  const repeatCount = 2; // play twice
+  const totalDuration = gifDuration * repeatCount;
+
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    const subject = encodeURIComponent("I'm interested in my branded app");
+    const body = encodeURIComponent(`I'm interested in my app to be branded and I like your offer price. Can you tell me how we can proceed and what is the procedure?\n\nDetails\nMy App Name:\nAttach App logo: if available\nApp title:\nApp Description:\n\nWaiting for your response.`);
+    const mailtoLink = `mailto:buildora.ai.in@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+  }, totalDuration);
+}
 </script>
+
 </body>
 </html>
